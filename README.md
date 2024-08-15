@@ -396,3 +396,47 @@ npm test
 - Implement end-to-end testing with tools like Cypress
 - Optimize Docker images for production deployment
 - Enhance logging and monitoring capabilities
+
+## Phase 8 Updates
+
+### Docker Integration
+- Added Dockerfiles for both backend and frontend
+- Created docker-compose.yml for easy local deployment
+- Integrated Loki and Grafana for logging and monitoring
+
+### Testing
+- Added basic pytest setup for backend testing
+- Included React Testing Library for frontend testing
+
+## Running the Application with Docker
+
+1. Build and start the containers:
+   ```
+   docker-compose up --build
+   ```
+
+2. Access the application:
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:5000
+   - Grafana: http://localhost:3000 (for log visualization)
+
+## Running Tests
+
+### Backend Tests
+```
+cd backend
+pytest
+```
+
+### Frontend Tests
+```
+cd frontend
+npm test
+```
+
+## Next Steps
+- Expand test coverage for both backend and frontend
+- Set up CI/CD pipeline for automated testing and deployment
+- Implement end-to-end testing with tools like Cypress
+- Optimize Docker images for production deployment
+- Enhance logging and monitoring capabilities

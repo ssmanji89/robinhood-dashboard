@@ -27,3 +27,4 @@ python-logging-loki
 flask-mail
 flask-mail
 pytest
+pytest
