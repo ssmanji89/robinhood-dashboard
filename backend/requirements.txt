@@ -11,3 +11,6 @@ Flask-JWT-Extended
 flask-socketio
 apscheduler
 yfinance
+flask-socketio
+apscheduler
+yfinance
