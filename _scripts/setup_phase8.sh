@@ -9,9 +9,9 @@ cd "$PROJECT_ROOT"
 echo "Setting up Phase 8 of the Robinhood Dashboard project..."
 
 # Function to create an admin user
-create_admin_user() {
-    echo "Creating admin user..."
-    docker-compose exec backend python3 -c "$(cat << EOF
+   create_admin_user() {
+       echo "Creating admin user..."
+       docker-compose exec backend python3 -c "$(cat << EOF
 from app import create_app
 from app.models.user import User, db
 import secrets
@@ -36,7 +36,7 @@ with app.app_context():
         print("Please store this password securely and change it after first login.")
 EOF
 )"
-}
+   }
 rebuild_and_restart_services() {
     echo "Stopping services..."
     docker-compose down
