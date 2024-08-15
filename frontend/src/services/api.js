@@ -32,3 +32,6 @@ export const getNotificationSettingsAPI = () => api.get('/notifications/settings
 export const updateNotificationSettingsAPI = (settings) => api.post('/notifications/settings', settings);
 
 export default api;
+export const getUsers = () => api.get('/admin/users');
+export const updateUser = (userId, userData) => api.put(`/admin/user/${userId}`, userData);
+export const getStats = () => api.get('/admin/stats');
