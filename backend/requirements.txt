@@ -26,3 +26,4 @@ scikit-learn
 python-logging-loki
 flask-mail
 flask-mail
+pytest
