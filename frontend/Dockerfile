@@ -3,10 +3,16 @@ FROM node:14 as build
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm ci
+# Copy package.json
+COPY package.json ./
 
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code
 COPY . .
+
+# Build the application
 RUN npm run build
 
 # Production stage
