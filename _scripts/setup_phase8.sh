@@ -15,9 +15,11 @@ FROM python:3.9-slim
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+
+EXPOSE 5000
 
 CMD ["flask", "run", "--host=0.0.0.0"]
 EOL
@@ -48,13 +50,11 @@ EOL
 
 # Docker Compose file
 cat > docker-compose.yml << EOL
-version: '3'
-
 services:
   backend:
     build: ./backend
     ports:
-      - "5000:5000"
+      - "5001:5000"
     environment:
       - FLASK_APP=app/__init__.py
       - FLASK_ENV=development
@@ -77,7 +77,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
@@ -343,33 +343,27 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 EOL
-
-# Update main app file
 cat > backend/app/__init__.py << EOL
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_socketio import SocketIO
 from flask_mail import Mail
+from flask_sqlalchemy import SQLAlchemy
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
 import os
 
-from .models.user import db
-from .auth import auth as auth_blueprint
-from .portfolio import portfolio as portfolio_blueprint
-from .trading import trading as trading_blueprint
-from .notifications import notifications as notifications_blueprint
-
 load_dotenv()
 
+db = SQLAlchemy()
 socketio = SocketIO()
 scheduler = BackgroundScheduler()
 mail = Mail()
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
+    CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
     
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///robinhood_dashboard.db'
@@ -386,27 +380,110 @@ def create_app():
     socketio.init_app(app, cors_allowed_origins="*")
     mail.init_app(app)
 
-    app.register_blueprint(auth_blueprint, url_prefix='/api/auth')
-    app.register_blueprint(portfolio_blueprint, url_prefix='/api/portfolio')
-    app.register_blueprint(trading_blueprint, url_prefix='/api/trading')
-    app.register_blueprint(notifications_blueprint, url_prefix='/api/notifications')
-
-    @app.route('/api/health')
-    def health_check():
-        return {'status': 'healthy'}, 200
-
     with app.app_context():
+        from .auth import auth as auth_blueprint
+        from .portfolio import portfolio as portfolio_blueprint
+        from .trading import trading as trading_blueprint
+        from .notifications import notifications as notifications_blueprint
+        from .admin import admin as admin_blueprint
+
+        app.register_blueprint(auth_blueprint, url_prefix='/api/auth')
+        app.register_blueprint(portfolio_blueprint, url_prefix='/api/portfolio')
+        app.register_blueprint(trading_blueprint, url_prefix='/api/trading')
+        app.register_blueprint(notifications_blueprint, url_prefix='/api/notifications')
+        app.register_blueprint(admin_blueprint, url_prefix='/api/admin')
+
+        @app.route('/api/health')
+        def health_check():
+            return {'status': 'healthy'}, 200
+
         db.create_all()
 
     scheduler.start()
 
     return app
-
-if __name__ == '__main__':
-    app = create_app()
-    socketio.run(app, debug=True)
 EOL
+cat > backend/app/utils/stock_updater.py << EOL
+import yfinance as yf
+from flask_socketio import emit
+from .. import socketio, scheduler
 
+def update_stock_prices(symbols):
+    data = yf.download(symbols, period="1d")
+    latest_prices = data['Close'].iloc[-1].to_dict()
+    socketio.emit('stock_update', latest_prices)
+
+def schedule_stock_updates(symbols, interval=60):
+    scheduler.add_job(
+        update_stock_prices,
+        'interval',
+        seconds=interval,
+        args=[symbols]
+    )
+EOL
+cat > backend/app/portfolio/routes.py << EOL
+from flask import jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from . import portfolio
+from ..models.user import User
+from ..models.trade import Trade
+from ..utils.stock_updater import schedule_stock_updates
+import yfinance as yf
+
+@portfolio.route('/holdings', methods=['GET'])
+@jwt_required()
+def get_holdings():
+    current_user_id = get_jwt_identity()
+    trades = Trade.query.filter_by(user_id=current_user_id).all()
+    holdings = {}
+    for trade in trades:
+        if trade.symbol not in holdings:
+            holdings[trade.symbol] = 0
+        if trade.type == 'buy':
+            holdings[trade.symbol] += trade.quantity
+        else:
+            holdings[trade.symbol] -= trade.quantity
+    
+    # Schedule real-time updates for the user's holdings
+    schedule_stock_updates(list(holdings.keys()))
+    
+    return jsonify(holdings), 200
+
+@portfolio.route('/performance', methods=['GET'])
+@jwt_required()
+def get_performance():
+    current_user_id = get_jwt_identity()
+    trades = Trade.query.filter_by(user_id=current_user_id).all()
+    
+    holdings = {}
+    for trade in trades:
+        if trade.symbol not in holdings:
+            holdings[trade.symbol] = {'quantity': 0, 'cost_basis': 0}
+        if trade.type == 'buy':
+            holdings[trade.symbol]['quantity'] += trade.quantity
+            holdings[trade.symbol]['cost_basis'] += trade.quantity * trade.price
+        else:
+            holdings[trade.symbol]['quantity'] -= trade.quantity
+            holdings[trade.symbol]['cost_basis'] -= trade.quantity * trade.price
+
+    symbols = list(holdings.keys())
+    current_prices = yf.download(symbols, period="1d")['Close'].iloc[-1]
+
+    performance = {}
+    for symbol, data in holdings.items():
+        if data['quantity'] > 0:
+            current_value = data['quantity'] * current_prices[symbol]
+            cost_basis = data['cost_basis']
+            performance[symbol] = {
+                'quantity': data['quantity'],
+                'cost_basis': cost_basis,
+                'current_value': current_value,
+                'profit_loss': current_value - cost_basis,
+                'profit_loss_percent': ((current_value - cost_basis) / cost_basis) * 100
+            }
+
+    return jsonify(performance), 200
+EOL
 # Update auth routes
 cat > backend/app/auth/routes.py << EOL
 from flask import jsonify, request

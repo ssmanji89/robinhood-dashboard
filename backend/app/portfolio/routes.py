@@ -1,6 +1,7 @@
 from flask import jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from . import portfolio
+from ..models.user import User
 from ..models.trade import Trade
 from ..utils.stock_updater import schedule_stock_updates
 import yfinance as yf
