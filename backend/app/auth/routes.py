@@ -2,7 +2,7 @@ from flask import jsonify, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from . import auth
 from ..models.user import User, db
-from werkzeug.security import generate_password_hash, check_password_hash
+from ..utils.logger import loki_logger
 
 @auth.route('/register', methods=['POST'])
 def register():
@@ -14,6 +14,7 @@ def register():
     new_user.set_password(data['password'])
     db.session.add(new_user)
     db.session.commit()
+    loki_logger.info(f"New user registered: {new_user.username}")
     return jsonify({"message": "User created successfully"}), 201
 
 @auth.route('/login', methods=['POST'])
@@ -22,7 +23,9 @@ def login():
     user = User.query.filter_by(username=data['username']).first()
     if user and user.check_password(data['password']):
         access_token = create_access_token(identity=user.id)
+        loki_logger.info(f"User logged in: {user.username}")
         return jsonify(access_token=access_token), 200
+    loki_logger.warning(f"Failed login attempt for username: {data['username']}")
     return jsonify({"message": "Invalid username or password"}), 401
 
 @auth.route('/protected', methods=['GET'])

@@ -1,6 +1,5 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_socketio import SocketIO
 from flask_mail import Mail
@@ -8,12 +7,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
 import os
 
+from .models.user import db
 from .auth import auth as auth_blueprint
 from .portfolio import portfolio as portfolio_blueprint
 from .trading import trading as trading_blueprint
 from .notifications import notifications as notifications_blueprint
-from .models.user import db
-from .utils.logger import loki_logger
 
 load_dotenv()
 
@@ -44,16 +42,6 @@ def create_app():
     app.register_blueprint(portfolio_blueprint, url_prefix='/api/portfolio')
     app.register_blueprint(trading_blueprint, url_prefix='/api/trading')
     app.register_blueprint(notifications_blueprint, url_prefix='/api/notifications')
-
-    @app.errorhandler(404)
-    def not_found(error):
-        loki_logger.error(f"404 error: {str(error)}")
-        return jsonify({"error": "Not found"}), 404
-
-    @app.errorhandler(500)
-    def internal_error(error):
-        loki_logger.error(f"500 error: {str(error)}")
-        return jsonify({"error": "Internal server error"}), 500
 
     @app.route('/api/health')
     def health_check():
