@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Navigation from './components/Navigation';
 import Dashboard from './pages/Dashboard';
 import Portfolio from './pages/Portfolio';
@@ -43,6 +45,7 @@ function App() {
             {isAuthenticated ? <Trading /> : <Redirect to="/login" />}
           </Route>
         </Switch>
+        <ToastContainer />
       </div>
     </Router>
   );

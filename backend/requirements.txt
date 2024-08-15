@@ -8,3 +8,6 @@ SQLAlchemy
 Flask-SQLAlchemy
 python-dotenv
 Flask-JWT-Extended
+flask-socketio
+apscheduler
+yfinance
