@@ -36,3 +36,31 @@ This project is a programmatic trading system dashboard for Robinhood, developed
    cd frontend
    npm start
    ```
+
+## Project Structure
+
+### Backend
+- `auth/`: Authentication module
+- `portfolio/`: Portfolio management module
+- `trading/`: Trading execution module
+
+### Frontend
+- `components/`: Reusable React components
+- `pages/`: Main page components
+- `services/`: API and other services
+
+## Testing
+
+### Backend
+Run tests with pytest:
+```
+cd backend
+pytest
+```
+
+### Frontend
+Run tests with React Testing Library:
+```
+cd frontend
+npm test
+```

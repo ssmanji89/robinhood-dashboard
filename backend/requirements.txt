@@ -3,3 +3,4 @@ flask-cors
 robin_stocks
 pandas
 numpy
+pytest
