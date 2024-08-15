@@ -3,6 +3,11 @@
 # Set the project root directory
 PROJECT_ROOT="/Users/sulemanmanji/Documents/GitHub/robinhood-dashboard"
 
+# Navigate to the project root
+cd "$PROJECT_ROOT"
+
+echo "Setting up Phase 8 of the Robinhood Dashboard project..."
+
 
 # Update the rebuild_and_restart_services function
 rebuild_and_restart_services() {
@@ -50,6 +55,27 @@ EOF
 )"
 }
 
+
+# Add these commands to the end of your script
+echo "To rebuild and restart the services, run:"
+echo "bash -c 'source setup_phase8.sh && rebuild_and_restart_services'"
+# Add these commands to the end of your script
+echo "To rebuild and restart the services, run:"
+echo "bash -c 'source setup_phase8.sh && rebuild_and_restart_services'"
+
+# ... (rest of the script remains the same)
+# Add these commands to the end of your script
+echo "To start the services in the background, run:"
+echo "bash -c 'source setup_phase8.sh && start_services'"
+echo
+echo "To check the status of the services, run:"
+echo "bash -c 'source setup_phase8.sh && check_status'"
+echo
+echo "To stop the services, run:"
+echo "bash -c 'source setup_phase8.sh && stop_services'"
+
 # Commit changes
 git add .
-git commit -m "Added More Things"
+git commit -m "Phase 8: Dockerized application, set up local deployment, and added basic tests"
+
+echo "Phase 8 of Robinhood Dashboard project has been set up at $PROJECT_ROOT"
