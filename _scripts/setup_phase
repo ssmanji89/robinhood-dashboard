@@ -52,4 +52,6 @@ EOF
 
 # Commit changes
 git add .
-git commit -m "Added More Things"
+git commit -m "Phase 8: Dockerized application, set up local deployment, and added basic tests"
+
+echo "Phase 8 of Robinhood Dashboard project has been set up at $PROJECT_ROOT"
