@@ -188,3 +188,39 @@ Visit http://localhost:3000 to view the application.
 - Enhance the dashboard with charts and graphs
 - Implement user settings and preferences
 - Add support for multiple portfolios per user
+
+## Phase 5 Updates
+
+### Backend
+- Implemented real-time stock price updates using WebSockets
+- Added performance calculation for portfolio holdings
+- Integrated yfinance for fetching current stock prices
+- Implemented background job scheduling for periodic updates
+
+### Frontend
+- Added real-time updates to the Portfolio page
+- Implemented performance metrics display in the Portfolio
+- Added toast notifications for better user feedback
+
+## Running the Application
+
+1. Start the backend:
+   ```
+   cd backend
+   flask run
+   ```
+
+2. Start the frontend:
+   ```
+   cd frontend
+   npm start
+   ```
+
+Visit http://localhost:3000 to view the application.
+
+## Next Steps
+- Implement advanced trading strategies
+- Add more comprehensive error handling and logging
+- Enhance the dashboard with charts and graphs
+- Implement user settings and preferences
+- Add support for multiple portfolios per user
