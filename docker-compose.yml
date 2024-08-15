@@ -4,7 +4,7 @@ services:
   backend:
     build: ./backend
     ports:
-      - "5000:5000"
+      - "5001:5000"  # Changed from "5000:5000"
     environment:
       - FLASK_APP=app/__init__.py
       - FLASK_ENV=development
@@ -27,7 +27,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "3000:3000"
+      - "3001:3000"  # Changed from "3000:3000" to avoid conflict with frontend
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
