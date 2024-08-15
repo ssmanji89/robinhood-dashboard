@@ -1071,6 +1071,278 @@ EOL
 sed -i '/echo "Services are starting up."/a \    create_admin_user' setup_phase8.sh
 
 echo "Admin functionality has been added. Remember to use the create_admin_user function to set up the initial admin account."
+
+cat > frontend/src/components/Login.js << EOL
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { login } from '../services/api';
+
+const Login = ({ onLogin }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const history = useHistory();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await login({ username, password });
+      localStorage.setItem('token', response.data.access_token);
+      onLogin();
+      history.push('/');
+    } catch (error) {
+      console.error('Login failed:', error);
+      setError('Invalid username or password');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <input
+        type="text"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder="Username"
+        required
+      />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+        required
+      />
+      <button type="submit">Login</button>
+    </form>
+  );
+};
+
+export default Login;
+EOL
+
+cat > frontend/src/App.js << EOL
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import Navigation from './components/Navigation';
+import Dashboard from './pages/Dashboard';
+import Portfolio from './pages/Portfolio';
+import Trading from './pages/Trading';
+import NotificationSettings from './components/NotificationSettings';
+import AdminDashboard from './components/AdminDashboard';
+import Login from './components/Login';
+
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+  };
+
+  return (
+    <Router>
+      <div className="App">
+        {isAuthenticated && <Navigation onLogout={handleLogout} />}
+        <Switch>
+          <Route exact path="/login">
+            {isAuthenticated ? <Redirect to="/" /> : <Login onLogin={handleLogin} />}
+          </Route>
+          <Route exact path="/">
+            {isAuthenticated ? <Dashboard /> : <Redirect to="/login" />}
+          </Route>
+          <Route path="/portfolio">
+            {isAuthenticated ? <Portfolio /> : <Redirect to="/login" />}
+          </Route>
+          <Route path="/trading">
+            {isAuthenticated ? <Trading /> : <Redirect to="/login" />}
+          </Route>
+          <Route path="/notifications">
+            {isAuthenticated ? <NotificationSettings /> : <Redirect to="/login" />}
+          </Route>
+          <Route path="/admin">
+            {isAuthenticated ? <AdminDashboard /> : <Redirect to="/login" />}
+          </Route>
+        </Switch>
+        <Toaster position="top-right" />
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+EOL
+
+cat > frontend/src/components/AdminDashboard.js << EOL
+import React, { useState, useEffect } from 'react';
+import { getUsers, updateUser, getStats } from '../services/api';
+
+const AdminDashboard = () => {
+  const [users, setUsers] = useState([]);
+  const [stats, setStats] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchUsers();
+    fetchStats();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await getUsers();
+      setUsers(response.data);
+      setError(null);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+      setError('Failed to fetch users. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const response = await getStats();
+      setStats(response.data);
+    } catch (error) {
+      console.error('Failed to fetch stats:', error);
+    }
+  };
+
+  const handleUpdateUser = async (userId, userData) => {
+    try {
+      await updateUser(userId, userData);
+      fetchUsers();
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      setError('Failed to update user. Please try again.');
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  return (
+    <div>
+      <h2>Admin Dashboard</h2>
+      <div>
+        <h3>Stats</h3>
+        <p>Total Users: {stats.total_users}</p>
+        <p>Admin Users: {stats.admin_users}</p>
+      </div>
+      <div>
+        <h3>User Management</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Admin</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map(user => (
+              <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.username}</td>
+                <td>{user.email}</td>
+                <td>{user.is_admin ? 'Yes' : 'No'}</td>
+                <td>
+                  <button onClick={() => handleUpdateUser(user.id, { is_admin: !user.is_admin })}>
+                    Toggle Admin
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;
+EOL
+
+cat > backend/app/__init__.py << EOL
+from flask import Flask
+from flask_cors import CORS
+from flask_jwt_extended import JWTManager
+from flask_socketio import SocketIO
+from flask_mail import Mail
+from apscheduler.schedulers.background import BackgroundScheduler
+from dotenv import load_dotenv
+import os
+
+from .models.user import db
+from .auth import auth as auth_blueprint
+from .portfolio import portfolio as portfolio_blueprint
+from .trading import trading as trading_blueprint
+from .notifications import notifications as notifications_blueprint
+from .admin import admin as admin_blueprint
+
+load_dotenv()
+
+socketio = SocketIO()
+scheduler = BackgroundScheduler()
+mail = Mail()
+
+def create_app():
+    app = Flask(__name__)
+    CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+    
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///robinhood_dashboard.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['JWT_SECRET_KEY'] = os.getenv('SECRET_KEY')
+    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+    
+    db.init_app(app)
+    JWTManager(app)
+    socketio.init_app(app, cors_allowed_origins="*")
+    mail.init_app(app)
+
+    app.register_blueprint(auth_blueprint, url_prefix='/api/auth')
+    app.register_blueprint(portfolio_blueprint, url_prefix='/api/portfolio')
+    app.register_blueprint(trading_blueprint, url_prefix='/api/trading')
+    app.register_blueprint(notifications_blueprint, url_prefix='/api/notifications')
+    app.register_blueprint(admin_blueprint, url_prefix='/api/admin')
+
+    @app.route('/api/health')
+    def health_check():
+        return {'status': 'healthy'}, 200
+
+    with app.app_context():
+        db.create_all()
+
+    scheduler.start()
+
+    return app
+
+if __name__ == '__main__':
+    app = create_app()
+    socketio.run(app, debug=True)
+EOL
 # Update rebuild_and_restart_services function
 rebuild_and_restart_services() {
     echo "Stopping services..."

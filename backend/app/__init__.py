@@ -12,6 +12,7 @@ from .auth import auth as auth_blueprint
 from .portfolio import portfolio as portfolio_blueprint
 from .trading import trading as trading_blueprint
 from .notifications import notifications as notifications_blueprint
+from .admin import admin as admin_blueprint
 
 load_dotenv()
 
@@ -21,7 +22,7 @@ mail = Mail()
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
+    CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
     
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///robinhood_dashboard.db'
@@ -42,6 +43,7 @@ def create_app():
     app.register_blueprint(portfolio_blueprint, url_prefix='/api/portfolio')
     app.register_blueprint(trading_blueprint, url_prefix='/api/trading')
     app.register_blueprint(notifications_blueprint, url_prefix='/api/notifications')
+    app.register_blueprint(admin_blueprint, url_prefix='/api/admin')
 
     @app.route('/api/health')
     def health_check():

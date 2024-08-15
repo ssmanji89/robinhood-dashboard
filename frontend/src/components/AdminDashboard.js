@@ -4,6 +4,8 @@ import { getUsers, updateUser, getStats } from '../services/api';
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -12,10 +14,15 @@ const AdminDashboard = () => {
 
   const fetchUsers = async () => {
     try {
+      setLoading(true);
       const response = await getUsers();
       setUsers(response.data);
+      setError(null);
     } catch (error) {
       console.error('Failed to fetch users:', error);
+      setError('Failed to fetch users. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -34,8 +41,12 @@ const AdminDashboard = () => {
       fetchUsers();
     } catch (error) {
       console.error('Failed to update user:', error);
+      setError('Failed to update user. Please try again.');
     }
   };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div>

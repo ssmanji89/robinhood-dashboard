@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Portfolio from './pages/Portfolio';
 import Trading from './pages/Trading';
 import NotificationSettings from './components/NotificationSettings';
+import AdminDashboard from './components/AdminDashboard';
 import Login from './components/Login';
 
 function App() {
@@ -46,6 +47,9 @@ function App() {
           </Route>
           <Route path="/notifications">
             {isAuthenticated ? <NotificationSettings /> : <Redirect to="/login" />}
+          </Route>
+          <Route path="/admin">
+            {isAuthenticated ? <AdminDashboard /> : <Redirect to="/login" />}
           </Route>
         </Switch>
         <Toaster position="top-right" />
