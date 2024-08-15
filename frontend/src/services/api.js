@@ -29,3 +29,4 @@ export const getHoldingsAPI = () => api.get('/portfolio/holdings');
 export const getPerformanceAPI = () => api.get('/portfolio/performance');
 
 export default api;
+export const analyzeStockAPI = (symbol, strategy) => api.post('/trading/analyze', { symbol, strategy });

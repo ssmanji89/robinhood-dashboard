@@ -260,3 +260,41 @@ Visit http://localhost:3000 to view the application.
 - Enhance the dashboard with charts and graphs
 - Implement user settings and preferences
 - Add support for multiple portfolios per user
+
+## Phase 6 Updates
+
+### Backend
+- Implemented advanced trading strategies (Moving Average Crossover and RSI)
+- Added stock analysis endpoint
+- Implemented Loki logging for better error tracking
+
+### Frontend
+- Added StockAnalysis component for visualizing trading signals
+- Enhanced Dashboard with stock analysis feature
+
+## Running the Application
+
+1. Start the backend:
+   ```
+   cd backend
+   flask run
+   ```
+
+2. Start the frontend:
+   ```
+   cd frontend
+   npm start
+   ```
+
+3. (Optional) Set up Loki for logging:
+   - Install and run Grafana Loki
+   - Configure the LokiLogger in `backend/app/utils/logger.py` with your Loki server URL
+
+Visit http://localhost:3000 to view the application.
+
+## Next Steps
+- Implement backtesting for trading strategies
+- Add more advanced charting options
+- Implement user notifications for trading signals
+- Enhance error handling and add more comprehensive logging
+- Add support for multiple portfolios per user
