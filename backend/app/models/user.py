@@ -22,3 +22,8 @@ class User(db.Model):
     # ... (existing fields)
     email_notifications = db.Column(db.Boolean, default=True)
     push_notifications = db.Column(db.Boolean, default=True)
+
+class User(db.Model):
+    # ... (existing fields)
+    email_notifications = db.Column(db.Boolean, default=True)
+    push_notifications = db.Column(db.Boolean, default=True)

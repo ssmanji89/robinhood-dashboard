@@ -32,3 +32,5 @@ export default api;
 export const analyzeStockAPI = (symbol, strategy) => api.post('/trading/analyze', { symbol, strategy });
 export const getNotificationSettingsAPI = () => api.get('/notifications/settings');
 export const updateNotificationSettingsAPI = (settings) => api.post('/notifications/settings', settings);
+export const getNotificationSettingsAPI = () => api.get('/notifications/settings');
+export const updateNotificationSettingsAPI = (settings) => api.post('/notifications/settings', settings);
