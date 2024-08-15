@@ -1,17 +1,27 @@
+import axios from 'axios';
+
 const API_URL = 'http://localhost:5000/api';
 
-export const executeTradeAPI = async (tradeData) => {
-  const response = await fetch(`${API_URL}/trading/execute`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(tradeData),
-  });
-  return response.json();
-};
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
-export const getTradeHistoryAPI = async (userId) => {
-  const response = await fetch(`${API_URL}/trading/history?user_id=${userId}`);
-  return response.json();
-};
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export const login = (credentials) => api.post('/auth/login', credentials);
+export const register = (userData) => api.post('/auth/register', userData);
+export const executeTradeAPI = (tradeData) => api.post('/trading/execute', tradeData);
+export const getTradeHistoryAPI = () => api.get('/trading/history');
+export const getHoldingsAPI = () => api.get('/portfolio/holdings');
+export const getPerformanceAPI = () => api.get('/portfolio/performance');
+
+export default api;

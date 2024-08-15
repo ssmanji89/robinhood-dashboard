@@ -93,3 +93,26 @@ npm test
    ```
 
 Visit http://localhost:3000 to view the application.
+
+## Phase 4 Updates
+
+### Backend
+- Implemented JWT authentication
+- Added environment variable support
+- Enhanced portfolio module with holdings and performance endpoints
+
+### Frontend
+- Added login functionality
+- Implemented protected routes
+- Updated Portfolio page to display holdings
+- Added axios for API calls
+
+## Security Note
+Make sure to keep your .env file secure and never commit it to version control.
+
+## Next Steps
+- Implement real-time data updates
+- Add more advanced trading features
+- Enhance error handling and user feedback
+- Implement proper logout functionality
+- Add unit and integration tests

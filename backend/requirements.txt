@@ -6,3 +6,5 @@ numpy
 pytest
 SQLAlchemy
 Flask-SQLAlchemy
+python-dotenv
+Flask-JWT-Extended
