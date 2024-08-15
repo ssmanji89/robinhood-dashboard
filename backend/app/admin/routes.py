@@ -56,3 +56,25 @@ def get_stats():
         "total_users": total_users,
         "admin_users": admin_users
     }), 200
+
+@admin.route('/user/<int:user_id>/change-password', methods=['POST'])
+@jwt_required()
+def change_password(user_id):
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+    if not current_user.is_admin:
+        return jsonify({"message": "Admin access required"}), 403
+    
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    
+    data = request.json
+    new_password = data.get('new_password')
+    if not new_password:
+        return jsonify({"message": "New password is required"}), 400
+    
+    user.set_password(new_password)
+    db.session.commit()
+    loki_logger.info(f"Admin {current_user.username} changed password for user {user.username}")
+    return jsonify({"message": "Password changed successfully"}), 200

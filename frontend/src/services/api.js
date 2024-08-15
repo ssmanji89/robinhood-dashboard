@@ -35,3 +35,4 @@ export default api;
 export const getUsers = () => api.get('/admin/users');
 export const updateUser = (userId, userData) => api.put(`/admin/user/${userId}`, userData);
 export const getStats = () => api.get('/admin/stats');
+export const changePassword = (userId, newPassword) => api.post(`/admin/user/${userId}/change-password`, { new_password: newPassword });

@@ -1419,6 +1419,33 @@ with app.app_context():
 EOF
 )"
 }
+cat >> frontend/src/services/api.js << EOL
+export const changePassword = (userId, newPassword) => api.post(\`/admin/user/\${userId}/change-password\`, { new_password: newPassword });
+EOL
+cat >> backend/app/admin/routes.py << EOL
+
+@admin.route('/user/<int:user_id>/change-password', methods=['POST'])
+@jwt_required()
+def change_password(user_id):
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+    if not current_user.is_admin:
+        return jsonify({"message": "Admin access required"}), 403
+    
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    
+    data = request.json
+    new_password = data.get('new_password')
+    if not new_password:
+        return jsonify({"message": "New password is required"}), 400
+    
+    user.set_password(new_password)
+    db.session.commit()
+    loki_logger.info(f"Admin {current_user.username} changed password for user {user.username}")
+    return jsonify({"message": "Password changed successfully"}), 200
+EOL
 # Add these commands to the end of your script
 echo "To rebuild and restart the services, run:"
 echo "bash -c 'source setup_phase8.sh && rebuild_and_restart_services'"
