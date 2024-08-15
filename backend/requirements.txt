@@ -24,3 +24,4 @@ pandas
 numpy
 scikit-learn
 python-logging-loki
+flask-mail

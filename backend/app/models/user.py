@@ -17,3 +17,8 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+class User(db.Model):
+    # ... (existing fields)
+    email_notifications = db.Column(db.Boolean, default=True)
+    push_notifications = db.Column(db.Boolean, default=True)
