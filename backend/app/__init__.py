@@ -40,6 +40,7 @@ def create_app():
         from .trading import trading as trading_blueprint
         from .notifications import notifications as notifications_blueprint
         from .admin import admin as admin_blueprint
+        from .models.user import User
 
         app.register_blueprint(auth_blueprint, url_prefix='/api/auth')
         app.register_blueprint(portfolio_blueprint, url_prefix='/api/portfolio')
@@ -55,8 +56,24 @@ def create_app():
 
     scheduler.start()
 
-    return app
+    @app.cli.command('create-admin')
+    def create_admin():
+        """Create an admin user."""
+        import secrets
+        
+        with app.app_context():
+            existing_admin = User.query.filter_by(username='admin').first()
+            if existing_admin:
+                print("Admin user already exists. Skipping creation.")
+            else:
+                password = secrets.token_urlsafe(12)
+                admin = User(username='admin', email='admin@example.com', is_admin=True)
+                admin.set_password(password)
+                db.session.add(admin)
+                db.session.commit()
+                print("Admin user created successfully.")
+                print(f"Username: admin")
+                print(f"Password: {password}")
+                print("Please store this password securely and change it after first login.")
 
-if __name__ == '__main__':
-    app = create_app()
-    socketio.run(app, debug=True)
+    return app

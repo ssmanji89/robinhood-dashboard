@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   backend:
@@ -6,7 +6,7 @@ services:
     ports:
       - "5001:5000"
     environment:
-      - FLASK_APP=app/__init__.py
+      - FLASK_APP=app:create_app
       - FLASK_ENV=development
     volumes:
       - ./backend:/app
@@ -14,7 +14,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "3000:80"  # This maps container's port 80 to host's port 3000
+      - "3000:80"
     depends_on:
       - backend
 
