@@ -798,3 +798,73 @@ npm test
    ```
 
 Note: The frontend is served by Nginx on port 80 inside the container, which is mapped to port 3000 on your host machine.
+
+# Update README with new information
+cat >> README.md << EOL
+
+## Running the Application with Docker in Background
+
+1. Start the services in detached mode:
+   ```
+   bash -c 'source setup_phase8.sh && start_services'
+   ```
+
+2. Check the status of the services:
+   ```
+   bash -c 'source setup_phase8.sh && check_status'
+   ```
+
+3. Stop the services when done:
+   ```
+   bash -c 'source setup_phase8.sh && stop_services'
+   ```
+
+4. Access the application:
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:5001
+   - Grafana: http://localhost:3001 (for log visualization)
+
+## Running Tests
+
+### Backend Tests
+```
+cd backend
+pytest
+```
+
+### Frontend Tests
+```
+cd frontend
+npm test
+```
+
+## Next Steps
+- Expand test coverage for both backend and frontend
+- Set up CI/CD pipeline for automated testing and deployment
+- Implement end-to-end testing with tools like Cypress
+- Optimize Docker images for production deployment
+- Enhance logging and monitoring capabilities
+
+## Running the Application with Docker
+
+1. Start the services in detached mode:
+   ```
+   bash -c 'source setup_phase8.sh && start_services'
+   ```
+
+2. Access the application:
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:5001
+   - Grafana: http://localhost:3001 (for log visualization)
+
+3. Check the status of the services:
+   ```
+   bash -c 'source setup_phase8.sh && check_status'
+   ```
+
+4. Stop the services when done:
+   ```
+   bash -c 'source setup_phase8.sh && stop_services'
+   ```
+
+Note: The frontend is served by Nginx on port 80 inside the container, which is mapped to port 3000 on your host machine.

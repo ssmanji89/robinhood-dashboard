@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getHoldingsAPI, getPerformanceAPI, socket } from '../services/api';
 import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Portfolio = () => {
   const [holdings, setHoldings] = useState({});
@@ -65,15 +66,15 @@ const Portfolio = () => {
         <tbody>
           {Object.entries(performance).map(([symbol, data]) => (
             <tr key={symbol}>
-                <td>{symbol}</td>
-                <td>{data.quantity}</td>
-                <td>${(holdings[symbol]?.currentPrice || 0).toFixed(2)}</td>
-                <td>${data.current_value.toFixed(2)}</td>
-                <td>${data.cost_basis.toFixed(2)}</td>
-                <td>${data.profit_loss.toFixed(2)}</td>
-                <td>{data.profit_loss_percent.toFixed(2)}%</td>
+              <td>{symbol}</td>
+              <td>{data.quantity}</td>
+              <td>${(holdings[symbol]?.currentPrice || 0).toFixed(2)}</td>
+              <td>${data.current_value.toFixed(2)}</td>
+              <td>${data.cost_basis.toFixed(2)}</td>
+              <td>${data.profit_loss.toFixed(2)}</td>
+              <td>{data.profit_loss_percent.toFixed(2)}%</td>
             </tr>
-            ))}
+          ))}
         </tbody>
       </table>
     </div>
