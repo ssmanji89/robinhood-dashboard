@@ -1,8 +1,8 @@
 import axios from 'axios';
 import io from 'socket.io-client';
 
-const API_URL = 'http://localhost:5000/api';
-const SOCKET_URL = 'http://localhost:5000';
+const API_URL = 'http://localhost:5001/api';
+const SOCKET_URL = 'http://localhost:5001';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -27,10 +27,8 @@ export const executeTradeAPI = (tradeData) => api.post('/trading/execute', trade
 export const getTradeHistoryAPI = () => api.get('/trading/history');
 export const getHoldingsAPI = () => api.get('/portfolio/holdings');
 export const getPerformanceAPI = () => api.get('/portfolio/performance');
-
-export default api;
 export const analyzeStockAPI = (symbol, strategy) => api.post('/trading/analyze', { symbol, strategy });
 export const getNotificationSettingsAPI = () => api.get('/notifications/settings');
 export const updateNotificationSettingsAPI = (settings) => api.post('/notifications/settings', settings);
-export const getNotificationSettingsAPI = () => api.get('/notifications/settings');
-export const updateNotificationSettingsAPI = (settings) => api.post('/notifications/settings', settings);
+
+export default api;
