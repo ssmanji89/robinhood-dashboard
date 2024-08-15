@@ -64,3 +64,32 @@ Run tests with React Testing Library:
 cd frontend
 npm test
 ```
+
+## Phase 3 Updates
+
+### Backend
+- Added SQLAlchemy for database operations
+- Implemented User and Trade models
+- Enhanced trading module with execute and history endpoints
+
+### Frontend
+- Added React Router for navigation
+- Created separate pages for Dashboard, Portfolio, and Trading
+- Implemented basic trading form
+- Added API service for backend communication
+
+## Running the Application
+
+1. Start the backend:
+   ```
+   cd backend
+   flask run
+   ```
+
+2. Start the frontend:
+   ```
+   cd frontend
+   npm start
+   ```
+
+Visit http://localhost:3000 to view the application.

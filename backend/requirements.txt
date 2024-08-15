@@ -4,3 +4,5 @@ robin_stocks
 pandas
 numpy
 pytest
+SQLAlchemy
+Flask-SQLAlchemy
