@@ -76,4 +76,12 @@ def create_app():
                 print(f"Password: {password}")
                 print("Please store this password securely and change it after first login.")
 
+    @app.cli.command('list-users')
+    def list_users():
+        """List all users."""
+        with app.app_context():
+            users = User.query.all()
+            for user in users:
+                print(f"ID: {user.id}, Username: {user.username}, Email: {user.email}, Admin: {user.is_admin}")
+
     return app

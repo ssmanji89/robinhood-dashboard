@@ -3,9 +3,11 @@ FROM python:3.9-slim
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install  -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+
+RUN python init_db.py  # Run the initialization script
 
 EXPOSE 5000
 
